@@ -67,16 +67,18 @@ export const Features = (props: Readonly<FeaturesProps>) => {
 
                     <div className="w-full mt-5">
                         {data.bullets.map((item, index) => (
-                            <MotionDiv
-                                from="bottom"
-                                transition={{ duration: 0.8, delay: 0.6 }}>
-                                <Feature
-                                    key={index}
-                                    title={item.title}
-                                    icon={item.icon}>
-                                    {item.desc}
-                                </Feature>
-                            </MotionDiv>
+                            <>
+                                <MotionDiv
+                                    from="bottom"
+                                    transition={{ duration: 0.8, delay: 0.6 }}>
+                                    <Feature
+                                        key={index}
+                                        title={item.title}
+                                        icon={item.icon}>
+                                        {item.desc}
+                                    </Feature>
+                                </MotionDiv>
+                            </>
                         ))}
                     </div>
                 </div>
