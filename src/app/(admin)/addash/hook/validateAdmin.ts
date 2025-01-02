@@ -8,7 +8,7 @@ const useAdminValidation = (
 ) => {
     const router = useRouter();
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isAdminLoading, setIsAdminLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const validateAdminStatus = () => {
@@ -21,14 +21,14 @@ const useAdminValidation = (
                 router.push(redirectPath);
             } else {
                 setIsAdminLoggedIn(isLoggedIn);
-                setIsLoading(false);
+                setIsAdminLoading(false);
             }
         };
 
         validateAdminStatus();
     }, [router, redirectPath, redirectIfLoggedIn]);
 
-    return { isAdminLoggedIn, isLoading };
+    return { isAdminLoggedIn, isAdminLoading };
 };
 
 export default useAdminValidation;

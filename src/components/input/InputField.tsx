@@ -38,7 +38,7 @@ const InputField: React.FC<InputFieldProps> = ({
                 value={value}
                 onChange={onChange}
                 required={required}
-                className={`mt-2 block w-full px-3 py-2 border ${textPosition} border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0891b2]`}
+                className={`mt-2 block w-full px-3 py-2 border ${textPosition} border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0891b2] dark:bg-white dark:text-gray-900`}
             />
         </div>
     );

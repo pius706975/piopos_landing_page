@@ -1,52 +1,44 @@
 'use client';
-import LoadingComponent from '@/components/loading';
+import LoadingComponent from '@/components/Loading';
 import useAdminValidation from '../hook/validateAdmin';
 import ThemeChanger from '@/components/DarkSwitch';
-import EditButton from '@/components/button/EditButton';
-import DeleteButton from '@/components/button/DeleteButton';
 import { useState } from 'react';
+import { useAuth } from '@/service/api';
+import CreateNewPost from './CreateNewPost';
+import PostedContent from './Posted';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const BlogDashboard = () => {
-    const { isAdminLoggedIn, isLoading } = useAdminValidation();
+    useAuth();
+    const { isAdminLoggedIn, isAdminLoading } = useAdminValidation();
     const [activeTab, setActiveTab] = useState<string>('Posts');
-
-    const contents = [
-        {
-            title: 'The Power of Dream',
-            date: '28 June 2021',
-            createdBy: 'John Doe admin',
-            editedBy: 'John Doe admin',
-        },
-        {
-            title: 'Emotional Healing',
-            date: '22 June 2021',
-            createdBy: 'John Doe admin',
-            editedBy: 'Jane Doe admin',
-        },
-        {
-            title: 'Works vs School',
-            date: '21 June 2021',
-            createdBy: 'John Doe admin',
-            editedBy: 'Joko admin',
-        },
-    ];
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
     const menuTabs = [
-        { key: 'Posts', label: 'Posts' },
-        { key: 'CreateNewPost', label: 'Create New Post' },
+        { key: 'Posts', label: 'Konten' },
+        { key: 'CreateNewPost', label: 'Buat Konten Baru' },
     ];
 
     return (
         <>
-            {isLoading && <LoadingComponent />}
+            {isAdminLoading && <LoadingComponent />}
 
             {isAdminLoggedIn && (
-                <div className="min-h-screen flex">
+                <div className="min-h-screen flex flex-col lg:flex-row">
                     {/* Sidebar */}
-                    <aside className="bg-gradient-to-b from-[#007395] to-gray-600 dark:from-black dark:to-gray-800 w-64 min-h-screen text-white p-6">
-                        <h1 className="text-3xl  font-bold mb-8">
-                            Dashboard Admin
-                        </h1>
+                    <aside
+                        className={`bg-gradient-to-b from-[#007395] to-gray-600 dark:from-[#007395] dark:to-gray-800 w-64 h-screen text-white p-6 transform lg:translate-x-0 ${
+                            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        } fixed lg:sticky top-0 z-50 transition-transform`}>
+                        <div className="flex justify-between items-center mb-8">
+                            <h1 className="text-3xl font-bold">Dashboard</h1>
+                            <button
+                                className="lg:hidden text-white text-2xl"
+                                onClick={() => setSidebarOpen(false)}>
+                                &times;
+                            </button>
+                        </div>
                         <ul className="space-y-6">
                             {menuTabs.map(menu => (
                                 <li
@@ -56,7 +48,10 @@ const BlogDashboard = () => {
                                             ? 'font-bold'
                                             : ''
                                     }`}
-                                    onClick={() => setActiveTab(menu.key)}>
+                                    onClick={() => {
+                                        setActiveTab(menu.key);
+                                        setSidebarOpen(false);
+                                    }}>
                                     {menu.label}
                                 </li>
                             ))}
@@ -64,84 +59,56 @@ const BlogDashboard = () => {
                     </aside>
 
                     {/* Main Content */}
-                    <main className="flex-1 bg-gray-50 p-8">
+                    <main className="flex-1 bg-gray-50 p-4 lg:p-8 dark:bg-black">
                         {activeTab === 'Posts' && (
                             <>
-                                <div className="mb-6 flex">
-                                    <h2 className="text-xl font-semibold mr-4">
-                                        Posts
-                                    </h2>
+                                <div className="mb-6 flex items-center justify-between sticky top-0 bg-gray-50 dark:bg-black z-10 p-4">
+                                    <div className="flex">
+                                        <div>
+                                            <button
+                                                className="lg:hidden text-[#007395] dark:text-white text-xl mr-4"
+                                                onClick={() =>
+                                                    setSidebarOpen(!sidebarOpen)
+                                                }>
+                                                &#9776;
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl font-semibold">
+                                                Konten
+                                            </h2>
+                                        </div>
+                                    </div>
                                     <ThemeChanger />
                                 </div>
-                                <div className="grid grid-cols-3 gap-4 mb-8">
-                                    {contents.map((content, index) => (
-                                        <div
-                                            key={index}
-                                            className="bg-[#007395] p-6 rounded-lg text-center shadow-md">
-                                            <h3 className="text-2xl text-white font-semibold">
-                                                {content.title}
-                                            </h3>
-                                            <p className="text-lg text-gray-400 font-bold">
-                                                {content.date}
-                                            </p>
-                                            <div className="text-left">
-                                                <p className="text-lg text-gray-400 font-bold">
-                                                    Created by:{' '}
-                                                    {content.createdBy}
-                                                </p>
-                                                <p className="text-lg text-gray-400 font-bold">
-                                                    Edited by:{' '}
-                                                    {content.editedBy}
-                                                </p>
-                                            </div>
 
-                                            <div className="flex justify-between mt-4">
-                                                <EditButton />
-                                                <DeleteButton />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                <PostedContent API_URL={BASE_URL} />
                             </>
                         )}
 
                         {activeTab === 'CreateNewPost' && (
                             <>
-                                <div className="mb-6 flex">
-                                    <h2 className="text-xl font-semibold mr-4">
-                                        Create New Post
-                                    </h2>
+                                <div className="mb-6 flex items-center justify-between sticky top-0 bg-gray-50 dark:bg-black z-10 p-4">
+                                    <div className="flex">
+                                        <div>
+                                            <button
+                                                className="lg:hidden text-[#007395] dark:text-white text-xl mr-4"
+                                                onClick={() =>
+                                                    setSidebarOpen(!sidebarOpen)
+                                                }>
+                                                &#9776;
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl font-semibold">
+                                                Buat Konten Baru
+                                            </h2>
+                                        </div>
+                                    </div>
                                     <ThemeChanger />
                                 </div>
-                                
-                                <div>
-                                    <form className="mt-4">
-                                        <div className="mb-4">
-                                            <label className="block text-gray-700">
-                                                Title
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="w-full p-2 border border-gray-300 rounded-md"
-                                                placeholder="Enter post title"
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <label className="block text-gray-700">
-                                                Content
-                                            </label>
-                                            <textarea
-                                                className="w-full p-2 border border-gray-300 rounded-md"
-                                                placeholder="Enter post content"
-                                                rows={5}></textarea>
-                                        </div>
-                                        <button
-                                            type="submit"
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-md">
-                                            Submit
-                                        </button>
-                                    </form>
-                                </div>
+
+                                <CreateNewPost API_URL={BASE_URL} />
                             </>
                         )}
                     </main>

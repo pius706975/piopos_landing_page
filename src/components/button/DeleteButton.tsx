@@ -23,7 +23,7 @@ const DeleteButton: React.FC<ButtonProps> = ({
 
     return (
         <button
-            className={`flex items-center space-x-2 px-4 py-2 ${bgColor} rounded-lg shadow-md hover:${hoverColor}`}
+            className={`flex items-center space-x-2 px-4 py-2 ${bgColor} rounded-lg shadow-md hover:${hoverColor} active:bg-gray-300 transition-all duration-150`}
             type={type}
             onClick={handleClick}>
             <svg

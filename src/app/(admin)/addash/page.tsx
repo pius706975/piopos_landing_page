@@ -2,15 +2,17 @@
 import useAdminValidation from '@/app/(admin)/addash/hook/validateAdmin';
 import Link from 'next/link';
 import menuList from './menuItem';
-import LoadingComponent from '@/components/loading';
+import LoadingComponent from '@/components/Loading';
+import { useAuth } from '@/service/api';
 
 const Dashboard = () => {
-    const { isAdminLoggedIn, isLoading } = useAdminValidation();
+    useAuth();
+    const { isAdminLoggedIn, isAdminLoading } = useAdminValidation();
     const menuItems = menuList;
 
     return (
         <>
-            {isLoading && (
+            {isAdminLoading && (
                 <LoadingComponent/>
             )}
 

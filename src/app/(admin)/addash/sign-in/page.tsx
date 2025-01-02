@@ -3,7 +3,7 @@
 import Button from '@/components/button/Button';
 import InputField from '@/components/input/InputField';
 import PasswordInput from '@/components/input/PasswordInputField';
-import LoadingComponent from '@/components/loading';
+import LoadingComponent from '@/components/Loading';
 import { useErrorToast } from '@/components/message/ErrorMessage';
 import { useSuccessToast } from '@/components/message/SuccessMessage';
 import { signIn } from '@/service/api';
@@ -20,10 +20,10 @@ const AdminSignIn = () => {
 
     const [showPassword, setShowPassword] = useState(false);
     const { showError, ErrorToastComponent } = useErrorToast();
+    const { showSuccess, SuccessToastComponent } = useSuccessToast();
     const [loading, setLoading] = useState<boolean>(false);
     const [redirectLoading, setRedirectLoading] = useState<boolean>(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
-    const { showSuccess, SuccessToastComponent } = useSuccessToast();
 
     const validateAdminStatus = async () => {
         const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
@@ -131,7 +131,7 @@ const AdminSignIn = () => {
                         />
 
                         <Button
-                            text={loading ? 'Sedang memuat...' : 'Masuk'}
+                            text={loading ? 'Memeriksa...' : 'Masuk'}
                             type="submit"
                             bgColor="bg-cyan-600"
                             onClick={handleSubmit}

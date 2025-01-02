@@ -20,13 +20,18 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const { data } = await axios.post(`${API_URL}/admin/refresh-token`, {
-                    refreshToken: localStorage.getItem('refreshToken'),
-                });
+                const { data } = await axios.post(
+                    `${API_URL}/admin/refresh-token`,
+                    {
+                        refreshToken: localStorage.getItem('refreshToken'),
+                    },
+                );
 
-                localStorage.setItem('accessToken', data.token.access_token);
+                console.log('new access token: ', data.data.accessToken);
 
-                originalRequest.headers.Authorization = `Bearer ${data.token.access_token}`;
+                localStorage.setItem('accessToken', data.data.accessToken);
+
+                originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
 
                 return apiClient(originalRequest);
             } catch (error) {
@@ -39,7 +44,10 @@ apiClient.interceptors.response.use(
 );
 
 export const signIn = async (email: string, password: string) => {
-    const response = await apiClient.post('/admin/sign-in', { email, password });
+    const response = await apiClient.post('/admin/sign-in', {
+        email,
+        password,
+    });
 
     localStorage.setItem('accessToken', response.data.data.accessToken);
     localStorage.setItem('refreshToken', response.data.data.refreshToken);
@@ -54,11 +62,14 @@ export const signIn = async (email: string, password: string) => {
 export const useAuth = () => {
     const refreshToken = async () => {
         try {
-            const { data } = await axios.post(`${API_URL}/refresh-token`, {
-                refreshToken: localStorage.getItem('refreshToken'),
-            });
+            const { data } = await axios.post(
+                `${API_URL}/admin/refresh-token`,
+                {
+                    refreshToken: localStorage.getItem('refreshToken'),
+                },
+            );
 
-            localStorage.setItem('accessToken', data.token.accessToken);
+            localStorage.setItem('accessToken', data.accessToken);
         } catch (error) {
             console.log('Unable to refresh token', error);
         }
@@ -67,9 +78,12 @@ export const useAuth = () => {
     useEffect(() => {
         refreshToken();
 
-        const interval = setInterval(refreshToken, 4 * 60 * 1000);
+        const interval = setInterval(() => {
+            refreshToken();
+        }, 4 * 60 * 1000);
+
         return () => clearInterval(interval);
-    });
+    }, []);
 };
 
 // Just for example of protected route that requires access token

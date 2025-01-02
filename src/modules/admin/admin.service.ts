@@ -1,4 +1,3 @@
-// user.service.ts
 import bcrypt from 'bcrypt';
 import { createAdmin } from './admin.repo';
 
