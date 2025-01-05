@@ -49,7 +49,7 @@ const updateProfile = async ({
 }) => {
     const accessToken = localStorage.getItem('accessToken');
     try {
-        const response = await axios.put(
+        await axios.put(
             `${BASE_URL}/admin/profile/edit`,
             {
                 name: name,
@@ -60,13 +60,42 @@ const updateProfile = async ({
                 headers: { Authorization: accessToken },
             },
         );
-
-        console.log('response: ', response);
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(
                 error.response?.data?.message ||
                     'Failed to update admin profile',
+            );
+        }
+
+        throw new Error('An unexpected error occurred');
+    }
+};
+
+const updatePassword = async ({
+    oldPassword,
+    newPassword,
+}: {
+    oldPassword: string;
+    newPassword: string;
+}) => {
+    const accessToken = localStorage.getItem('accessToken');
+    try {
+        await axios.put(
+            `${BASE_URL}/admin/profile/update-password`,
+            {
+                oldPassword: oldPassword,
+                newPassword: newPassword,
+            },
+            {
+                headers: { Authorization: accessToken },
+            },
+        );
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(
+                error.response?.data?.message ||
+                    'Failed to update admin password',
             );
         }
 
@@ -88,9 +117,11 @@ const AdminProfile = () => {
         email: '',
     });
 
-    const [oldPassword, setOldPassword] = useState<string>('');
-    const [newPassword, setNewPassword] = useState<string>('');
-    const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
+    const [formPassword, setFormpassword] = useState({
+        oldPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+    });
 
     const { data, isLoading, error } = useQuery({
         queryKey: ['profile'],
@@ -130,9 +161,34 @@ const AdminProfile = () => {
             showSuccess('Data diri berhasil diubah');
             setLoading(false);
         },
-        onError: error => {
-            console.log(error);
+        onError: () => {
             showError('Data diri gagal diubah');
+            setLoading(false);
+        },
+    });
+
+    const updatePasswordMutation = useMutation({
+        mutationFn: ({
+            oldPassword,
+            newPassword,
+        }: {
+            oldPassword: string;
+            newPassword: string;
+        }) => updatePassword({ oldPassword, newPassword }),
+        onMutate: () => {
+            setLoading(true);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+            showSuccess('Password berhasil diubah');
+            setLoading(false);
+        },
+        onError: error => {
+            if (error.message === 'Old password is incorrect') {
+                showError('Password lama salah');
+            } else {
+                showError('Password gagal diubah');
+            }
             setLoading(false);
         },
     });
@@ -177,8 +233,50 @@ const AdminProfile = () => {
             });
 
             setLoading(false);
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            showError(error.message);
+        }
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormpassword({
+            ...formPassword,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handlePasswordSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        if (!formPassword.oldPassword) {
+            showError('Password lama belum diisi');
+            return;
+        }
+
+        if (!formPassword.newPassword) {
+            showError('Password baru belum diisi');
+            return;
+        }
+
+        if (!formPassword.confirmNewPassword) {
+            showError('Password baru harus dikonfirmasi');
+            return;
+        }
+
+        if (formPassword.newPassword !== formPassword.confirmNewPassword) {
+            showError('Password baru dan konfirmasi password harus sama');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            updatePasswordMutation.mutate({
+                oldPassword: formPassword.oldPassword,
+                newPassword: formPassword.newPassword,
+            });
+        } catch (error: any) {
+            showError(error.message);
         }
     };
 
@@ -190,12 +288,6 @@ const AdminProfile = () => {
         );
 
     if (error instanceof Error) return <div>Error: {error.message}</div>;
-
-    const handlePasswordSubmit = () => {
-        console.log('Password Lama:', oldPassword);
-        console.log('Password Baru:', newPassword);
-        console.log('Konfirmasi Password Baru:', confirmNewPassword);
-    };
 
     return (
         <>
@@ -267,9 +359,9 @@ const AdminProfile = () => {
                                             placeholder="Email"
                                         />
 
-                                        <div className='mb-4'>
-                                        {ErrorToastComponent}
-                                        {SuccessToastComponent}
+                                        <div className="mb-4">
+                                            {ErrorToastComponent}
+                                            {SuccessToastComponent}
                                         </div>
 
                                         <Button
@@ -294,27 +386,33 @@ const AdminProfile = () => {
                                     </h2>
                                     <div className="space-y-4">
                                         <ChangePasswordInputs
-                                            oldPassword={oldPassword}
-                                            newPassword={newPassword}
+                                            oldPassword={
+                                                formPassword.oldPassword
+                                            }
+                                            newPassword={
+                                                formPassword.newPassword
+                                            }
                                             confirmNewPassword={
-                                                confirmNewPassword
+                                                formPassword.confirmNewPassword
                                             }
-                                            onChangeOldPassword={e =>
-                                                setOldPassword(e.target.value)
+                                            onChangeOldPassword={
+                                                handlePasswordChange
                                             }
-                                            onChangeNewPassword={e =>
-                                                setNewPassword(e.target.value)
+                                            onChangeNewPassword={
+                                                handlePasswordChange
                                             }
-                                            onChangeConfirmNewPassword={e =>
-                                                setConfirmNewPassword(
-                                                    e.target.value,
-                                                )
+                                            onChangeConfirmNewPassword={
+                                                handlePasswordChange
                                             }
                                         />
 
                                         <Button
-                                            text="Ubah Password"
-                                            onClick={() => handlePasswordSubmit}
+                                            text={
+                                                loading
+                                                    ? 'Mengubah...'
+                                                    : 'Ubah Password'
+                                            }
+                                            onClick={handlePasswordSubmit}
                                             bgColor="bg-[#007395]"
                                         />
                                     </div>
