@@ -8,6 +8,7 @@ interface ContentCardProps {
     lastUpdated: string;
     createdBy: string;
     updatedBy: string;
+    onclick?: () => void;
     editAction?: () => void;
     deleteAction?: () => void;
 }
@@ -17,15 +18,24 @@ const ContentCard = ({
     lastUpdated,
     createdBy,
     updatedBy,
+    onclick,
     editAction,
     deleteAction,
 }: ContentCardProps) => {
+    const truncateText = (text: string, maxLength: number) => {
+        return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+    }
+
     return (
         <>
             <div
                 key={key}
                 className="bg-[#007395] p-6 rounded-lg text-center shadow-md">
-                <h3 className="text-2xl text-white font-semibold">{title}</h3>
+                <h3
+                    onClick={onclick}
+                    className="text-2xl text-white font-semibold cursor-pointer">
+                    {truncateText(title, 25)}
+                </h3>
                 <p className="text-sm text-gray-400 font-bold">
                     Update terakhir: {formatDate(lastUpdated)}
                 </p>

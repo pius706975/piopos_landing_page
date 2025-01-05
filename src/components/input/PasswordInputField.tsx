@@ -6,7 +6,7 @@ interface PasswordInputProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     showPassword: boolean;
     placeholder?: string;
-    toggleShowPassword: () => void;
+    toggleShowPassword?: () => void;
     toggleShowPasswordColor?: string;
     label?: string;
 }
@@ -24,7 +24,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         <div className="mb-6">
             <label
                 htmlFor="password"
-                className="block text-lg font-medium text-white">
+                className="block text-lg font-medium dark:text-white">
                 {label}
             </label>
             <input
@@ -35,7 +35,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 // required
-                className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-[#1e1e1e] dark:border-gray-600 dark:text-white'
             />
             <div className="flex items-center mt-2">
                 <input

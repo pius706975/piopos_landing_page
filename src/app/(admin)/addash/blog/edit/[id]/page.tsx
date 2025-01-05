@@ -29,7 +29,15 @@ const fetchContentData = async (id: string) => {
     }
 };
 
-const UpdateContentData = async ({ id, title, content }: { id: string; title: string, content: string }) => {
+const UpdateContentData = async ({
+    id,
+    title,
+    content,
+}: {
+    id: string;
+    title: string;
+    content: string;
+}) => {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await axios.put(
@@ -141,10 +149,26 @@ const EditContent = ({ params }: { params: { id: string } }) => {
                 <div className="min-h-screen flex flex-col lg:flex-row">
                     <main className="flex-1 bg-gray-50 p-4 lg:p-8 dark:bg-black">
                         <div className="mb-6 flex items-center justify-between sticky top-0 bg-gray-50 dark:bg-black z-10 p-4">
-                            <div>
-                                <h2 className="text-xl font-semibold">
-                                    Edit Konten
-                                </h2>
+                            <div className="flex">
+                                <div>
+                                    <button
+                                        className="text-[#007395] dark:text-white text-xl mr-4"
+                                        onClick={() => router.back()}>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="currentColor"
+                                            width="24"
+                                            height="24">
+                                            <path d="M15.54 4.46a.75.75 0 010 1.06L10.1 11.25H21a.75.75 0 010 1.5H10.1l5.44 5.73a.75.75 0 11-1.06 1.06l-6.5-6.85a.75.75 0 010-1.06l6.5-6.85a.75.75 0 011.06 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-semibold">
+                                        Edit Konten
+                                    </h2>
+                                </div>
                             </div>
 
                             <ThemeChanger />

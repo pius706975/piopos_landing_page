@@ -89,8 +89,9 @@ const PostedContent = ({ API_URL }: PostedContentProps) => {
                         lastUpdated={content.updatedAt}
                         createdBy={content.createdBy.name}
                         updatedBy={content.updatedBy.name}
+                        onclick={() => router.push(`/addash/blog/detail/${content._id}`)}
                         editAction={() =>
-                            router.push(`/addash/blog/${content._id}/edit`)
+                            router.push(`/addash/blog/edit/${content._id}`)
                         }
                         deleteAction={() => {
                             setDeleteModalOpen(true);
@@ -111,12 +112,12 @@ const PostedContent = ({ API_URL }: PostedContentProps) => {
                         </p>
                         <div className="flex justify-end space-x-4">
                             <button
-                                className="px-4 py-2 bg-gray-300 dark:text-gray-900 rounded"
+                                className="px-4 py-2 bg-gray-300 dark:text-gray-900 rounded-2xl"
                                 onClick={() => setDeleteModalOpen(false)}>
                                 Batal
                             </button>
                             <button
-                                className="px-4 py-2 bg-red-600 text-white rounded"
+                                className="px-4 py-2 bg-red-600 text-white rounded-2xl"
                                 onClick={handleDelete}>
                                 Hapus
                             </button>

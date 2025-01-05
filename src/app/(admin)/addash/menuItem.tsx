@@ -39,7 +39,7 @@ const menuList = [
         icon: <ProfileIcon />,
         bg: 'bg-purple-500',
         activeBg: 'active:bg-purple-700',
-        href: '/addash',
+        href: '/addash/profile',
     },
 ];
 

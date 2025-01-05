@@ -39,20 +39,20 @@ const TinyMCEEditor = ({
                     'anchor',
                     'searchreplace',
                     'visualblocks',
-                    'code',
                     'fullscreen',
                     'insertdatetime',
                     'media',
                     'table',
-                    'code',
                     'help',
                     'wordcount',
+                    'blocks',
                 ],
                 toolbar:
-                    'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+                    'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image | link | preview | fullscreen | help | insertcode',  
                 content_style:
                     'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
             }}
+
         />
     );
 };
