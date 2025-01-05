@@ -5,6 +5,7 @@ import './globals.css';
 
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/footer/Footer';
+import ClientProvider from './components/ClientProvide';
 // import { PopupWidget } from '@/components/PopupWidget';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -23,10 +24,12 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
                 <ThemeProvider attribute="class">
-                    <Navbar />
-                    <div>{children}</div>
-                    <Footer />
-                    {/* <PopupWidget /> */}
+                    <ClientProvider>
+                        <Navbar />
+                        <div>{children}</div>
+                        <Footer />
+                        {/* <PopupWidget /> */}
+                    </ClientProvider>
                 </ThemeProvider>
             </body>
         </html>
