@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-export const fetchProfile = async ({ API_URL }: { API_URL: string | undefined }) => {
+export const fetchProfile = async ({
+    API_URL,
+}: {
+    API_URL: string | undefined;
+}) => {
     const accessToken = localStorage.getItem('accessToken');
 
     try {
@@ -24,17 +28,18 @@ export const fetchProfile = async ({ API_URL }: { API_URL: string | undefined })
     }
 };
 
+interface UpdateProfileProps {
+    API_URL: string | undefined;
+    name: string;
+    username: string;
+    email: string;
+}
 export const updateProfile = async ({
     API_URL,
     name,
     username,
     email,
-}: {
-    API_URL: string | undefined;
-    name: string;
-    username: string;
-    email: string;
-}) => {
+}: UpdateProfileProps) => {
     const accessToken = localStorage.getItem('accessToken');
     try {
         await axios.put(
@@ -60,15 +65,17 @@ export const updateProfile = async ({
     }
 };
 
+interface UpdatePasswordProps {
+    API_URL: string | undefined;
+    oldPassword: string;
+    newPassword: string;
+}
+
 export const updatePassword = async ({
     API_URL,
     oldPassword,
     newPassword,
-}: {
-    API_URL: string | undefined;
-    oldPassword: string;
-    newPassword: string;
-}) => {
+}: UpdatePasswordProps) => {
     const accessToken = localStorage.getItem('accessToken');
     try {
         await axios.put(

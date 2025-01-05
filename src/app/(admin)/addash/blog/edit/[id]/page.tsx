@@ -3,7 +3,6 @@ import InputField from '@/components/input/InputField';
 import LoadingComponent from '@/components/Loading';
 import { useAuth } from '@/service/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { FormEvent, useMemo, useState } from 'react';
 import useAdminValidation from '../../../hook/validateAdmin';
@@ -12,53 +11,9 @@ import TinyMCEEditor from '../../components/EditorTinyMCE';
 import Button from '@/components/button/Button';
 import { useErrorToast } from '@/components/message/ErrorMessage';
 import { useSuccessToast } from '@/components/message/SuccessMessage';
+import { fetchContentData, UpdateContentData } from './hooks';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-const fetchContentData = async (id: string) => {
-    try {
-        const response = await axios.get(`${BASE_URL}/admin/blog/${id}`);
-        return response.data.data;
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.log('error', error);
-            throw new Error(
-                error.response?.data?.message || 'Failed to fetch blog data',
-            );
-        }
-        throw new Error('An unexpected error occurred');
-    }
-};
-
-const UpdateContentData = async ({
-    id,
-    title,
-    content,
-}: {
-    id: string;
-    title: string;
-    content: string;
-}) => {
-    const accessToken = localStorage.getItem('accessToken');
-    try {
-        const response = await axios.put(
-            `${BASE_URL}/admin/blog/edit/${id}`,
-            { title: title, description: content },
-            {
-                headers: { Authorization: accessToken },
-            },
-        );
-
-        // console.log('updated: ', response);
-        return response.data;
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            throw new Error(
-                error.response?.data?.message || 'Failed to update blog',
-            );
-        }
-        throw new Error('An unexpected error occurred');
-    }
-};
 
 const EditContent = ({ params }: { params: { id: string } }) => {
     useAuth();
@@ -75,7 +30,7 @@ const EditContent = ({ params }: { params: { id: string } }) => {
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['blog', id],
-        queryFn: () => fetchContentData(id),
+        queryFn: () => fetchContentData({ API_URL: BASE_URL, id }),
     });
 
     useMemo(() => {
@@ -87,7 +42,12 @@ const EditContent = ({ params }: { params: { id: string } }) => {
 
     const mutation = useMutation({
         mutationFn: ({ title, content }: { title: string; content: string }) =>
-            UpdateContentData({ id, title: title, content: content }),
+            UpdateContentData({
+                API_URL: BASE_URL,
+                id,
+                title: title,
+                content: content,
+            }),
         onMutate: () => {
             setLoading(true);
         },

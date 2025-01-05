@@ -1,43 +1,11 @@
-import DeleteButton from '@/components/button/DeleteButton';
-import EditButton from '@/components/button/EditButton';
 import LoadingComponent from '@/components/Loading';
-import formatDate from '@/utils/dateFormatter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import ContentCard from './components/ContentCard';
+import { deleteContent, fetchContents } from './hooks';
 
-interface PostedContentProps {
-    API_URL: string | undefined;
-}
-
-const fetchContents = async (API_URL: string | undefined) => {
-    try {
-        const { data } = await axios.get(`${API_URL}/admin/blog/get-posts`);
-        return data.data;
-    } catch (error) {
-        throw new Error('Error fetching contents');
-    }
-};
-
-const deleteContent = async (id: string, API_URL: string | undefined) => {
-    const accessToken = localStorage.getItem('accessToken');
-    try {
-        await axios.delete(`${API_URL}/admin/blog/delete/${id}`, {
-            headers: { Authorization: accessToken },
-        });
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            throw new Error(
-                error.response?.data?.message || 'Failed to delete content',
-            );
-        }
-        throw new Error('An unexpected error occurred');
-    }
-};
-
-const PostedContent = ({ API_URL }: PostedContentProps) => {
+const PostedContent = ({ API_URL }: {API_URL: string | undefined;}) => {
     const router = useRouter();
     const queryClient = useQueryClient();
 
@@ -76,8 +44,6 @@ const PostedContent = ({ API_URL }: PostedContentProps) => {
         );
 
     if (error instanceof Error) return <div>Error: {error.message}</div>;
-
-    // console.log(data);
 
     return (
         <div>
