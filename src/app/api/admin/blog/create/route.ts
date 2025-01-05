@@ -1,4 +1,4 @@
-import { createPostService } from '@/modules/blog/blog.service';
+import { createPostService } from '@/app/api/modules/blog/blog.service';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateFields } from './validator';
 import { authMiddleware } from '@/middlewares/auth.middleware';

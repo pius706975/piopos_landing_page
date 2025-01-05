@@ -1,5 +1,5 @@
 import { authMiddleware } from "@/middlewares/auth.middleware";
-import { deletePostService } from "@/modules/blog/blog.service";
+import { deletePostService } from "@/app/api/modules/blog/blog.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(req: NextRequest) {

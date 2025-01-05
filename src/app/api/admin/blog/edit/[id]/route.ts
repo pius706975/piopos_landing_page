@@ -1,5 +1,5 @@
 import { authMiddleware } from "@/middlewares/auth.middleware";
-import { updatePostService } from "@/modules/blog/blog.service";
+import { updatePostService } from "@/app/api/modules/blog/blog.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest) {

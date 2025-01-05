@@ -1,5 +1,5 @@
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { updateAdminProfileService } from '@/modules/admin/admin.service';
+import { updateAdminProfileService } from '@/app/api/modules/admin/admin.service';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateFields } from './validator';
 

@@ -1,5 +1,5 @@
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { getAdminProfileService } from '@/modules/admin/admin.service';
+import { getAdminProfileService } from '@/app/api/modules/admin/admin.service';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {

@@ -1,4 +1,4 @@
-import { getDetailPostService } from '@/modules/blog/blog.service';
+import { getDetailPostService } from '@/app/api/modules/blog/blog.service';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {

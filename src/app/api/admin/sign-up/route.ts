@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { signUpAdminService } from '@/modules/admin/admin.service';
+import { signUpAdminService } from '@/app/api/modules/admin/admin.service';
 import { validateFields } from './validator';
 
 export async function POST(req: NextRequest) {

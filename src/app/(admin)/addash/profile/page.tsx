@@ -1,284 +1,23 @@
 'use client';
-import axios from 'axios';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import LoadingComponent from '@/components/Loading';
 import { useAuth } from '@/service/api';
 import useAdminValidation from '../hook/validateAdmin';
 import ThemeChanger from '@/components/DarkSwitch';
-import InputField from '@/components/input/InputField';
 import Button from '@/components/button/Button';
-import ChangePasswordInputs from '@/components/input/ChangePasswordInputField';
-import { FormEvent, useMemo, useState } from 'react';
-import { useErrorToast } from '@/components/message/ErrorMessage';
-import { useSuccessToast } from '@/components/message/SuccessMessage';
+import UpdateProfile from './components/UpdateProfile';
+import UpdatePassword from './components/UpdatePassword';
+import { fetchProfile } from './components/hooks/hooks';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
-const fetchProfile = async () => {
-    const accessToken = localStorage.getItem('accessToken');
-
-    try {
-        const response = await axios.get(`${BASE_URL}/admin/profile`, {
-            headers: { Authorization: accessToken },
-        });
-
-        if (
-            response.data.status === 200 ||
-            response.data.message === '"Successfully fetched profile"'
-        ) {
-            return response.data.data;
-        }
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            throw new Error(
-                error.response?.data?.message ||
-                    'Failed to fetch admin profile',
-            );
-        }
-    }
-};
-
-const updateProfile = async ({
-    name,
-    username,
-    email,
-}: {
-    name: string;
-    username: string;
-    email: string;
-}) => {
-    const accessToken = localStorage.getItem('accessToken');
-    try {
-        await axios.put(
-            `${BASE_URL}/admin/profile/edit`,
-            {
-                name: name,
-                username: username,
-                email: email,
-            },
-            {
-                headers: { Authorization: accessToken },
-            },
-        );
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            throw new Error(
-                error.response?.data?.message ||
-                    'Failed to update admin profile',
-            );
-        }
-
-        throw new Error('An unexpected error occurred');
-    }
-};
-
-const updatePassword = async ({
-    oldPassword,
-    newPassword,
-}: {
-    oldPassword: string;
-    newPassword: string;
-}) => {
-    const accessToken = localStorage.getItem('accessToken');
-    try {
-        await axios.put(
-            `${BASE_URL}/admin/profile/update-password`,
-            {
-                oldPassword: oldPassword,
-                newPassword: newPassword,
-            },
-            {
-                headers: { Authorization: accessToken },
-            },
-        );
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            throw new Error(
-                error.response?.data?.message ||
-                    'Failed to update admin password',
-            );
-        }
-
-        throw new Error('An unexpected error occurred');
-    }
-};
 
 const AdminProfile = () => {
     useAuth();
     const { isAdminLoggedIn, isAdminLoading } = useAdminValidation();
-    const { showError, ErrorToastComponent } = useErrorToast();
-    const { showSuccess, SuccessToastComponent } = useSuccessToast();
-    const [loading, setLoading] = useState<boolean>(false);
-    const queryClient = useQueryClient();
-
-    const [formProfileData, setFormProfileData] = useState({
-        name: '',
-        username: '',
-        email: '',
-    });
-
-    const [formPassword, setFormpassword] = useState({
-        oldPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
-    });
-
     const { data, isLoading, error } = useQuery({
         queryKey: ['profile'],
-        queryFn: () => fetchProfile(),
+        queryFn: () => fetchProfile({ API_URL: BASE_URL }),
     });
-
-    useMemo(() => {
-        if (
-            data &&
-            !formProfileData.name &&
-            !formProfileData.username &&
-            !formProfileData.email
-        ) {
-            setFormProfileData({
-                name: data.name,
-                username: data.username,
-                email: data.email,
-            });
-        }
-    }, [data, formProfileData]);
-
-    const updateDataMutation = useMutation({
-        mutationFn: ({
-            name,
-            username,
-            email,
-        }: {
-            name: string;
-            username: string;
-            email: string;
-        }) => updateProfile({ name, username, email }),
-        onMutate: () => {
-            setLoading(true);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['profile'] });
-            showSuccess('Data diri berhasil diubah');
-            setLoading(false);
-        },
-        onError: () => {
-            showError('Data diri gagal diubah');
-            setLoading(false);
-        },
-    });
-
-    const updatePasswordMutation = useMutation({
-        mutationFn: ({
-            oldPassword,
-            newPassword,
-        }: {
-            oldPassword: string;
-            newPassword: string;
-        }) => updatePassword({ oldPassword, newPassword }),
-        onMutate: () => {
-            setLoading(true);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['profile'] });
-            showSuccess('Password berhasil diubah');
-            setLoading(false);
-        },
-        onError: error => {
-            if (error.message === 'Old password is incorrect') {
-                showError('Password lama salah');
-            } else {
-                showError('Password gagal diubah');
-            }
-            setLoading(false);
-        },
-    });
-
-    const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormProfileData({
-            ...formProfileData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    const handleProfileSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-
-        if (!formProfileData.name) {
-            showError('Nama belum diisi');
-            return;
-        }
-
-        if (!formProfileData.username) {
-            showError('Username belum diisi');
-            return;
-        }
-
-        if (!formProfileData.email) {
-            showError('Email belum diisi');
-            return;
-        }
-
-        if (!/^\S+@\S+\.\S+$/.test(formProfileData.email)) {
-            showError('Format email salah');
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            updateDataMutation.mutate({
-                name: formProfileData.name,
-                username: formProfileData.username,
-                email: formProfileData.email,
-            });
-
-            setLoading(false);
-        } catch (error: any) {
-            showError(error.message);
-        }
-    };
-
-    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormpassword({
-            ...formPassword,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    const handlePasswordSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-
-        if (!formPassword.oldPassword) {
-            showError('Password lama belum diisi');
-            return;
-        }
-
-        if (!formPassword.newPassword) {
-            showError('Password baru belum diisi');
-            return;
-        }
-
-        if (!formPassword.confirmNewPassword) {
-            showError('Password baru harus dikonfirmasi');
-            return;
-        }
-
-        if (formPassword.newPassword !== formPassword.confirmNewPassword) {
-            showError('Password baru dan konfirmasi password harus sama');
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            updatePasswordMutation.mutate({
-                oldPassword: formPassword.oldPassword,
-                newPassword: formPassword.newPassword,
-            });
-        } catch (error: any) {
-            showError(error.message);
-        }
-    };
 
     if (isLoading)
         return (
@@ -328,95 +67,14 @@ const AdminProfile = () => {
                                         </button>
                                     </div>
 
-                                    <div className="w-full">
-                                        <InputField
-                                            type="text"
-                                            id="name"
-                                            name="name"
-                                            value={formProfileData.name}
-                                            onChange={handleProfileChange}
-                                            label="Name"
-                                            placeholder="Name"
-                                        />
-
-                                        <InputField
-                                            type="text"
-                                            id="username"
-                                            name="username"
-                                            value={formProfileData.username}
-                                            onChange={handleProfileChange}
-                                            label="Username"
-                                            placeholder="Username"
-                                        />
-
-                                        <InputField
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            value={formProfileData.email}
-                                            onChange={handleProfileChange}
-                                            label="Email"
-                                            placeholder="Email"
-                                        />
-
-                                        <div className="mb-4">
-                                            {ErrorToastComponent}
-                                            {SuccessToastComponent}
-                                        </div>
-
-                                        <Button
-                                            text={
-                                                loading
-                                                    ? 'Mengubah...'
-                                                    : 'Ubah Data Diri'
-                                            }
-                                            onClick={handleProfileSubmit}
-                                            bgColor="bg-[#007395]"
-                                        />
-                                    </div>
+                                    <UpdateProfile API_URL={BASE_URL} />
 
                                     <div className="w-full"></div>
                                 </div>
                             </div>
 
                             <div className="w-full lg:w-2/3">
-                                <div className="bg-gray-100 dark:bg-[#2c2c2c] p-4 rounded-md shadow">
-                                    <h2 className="text-lg font-bold text-gray-700 dark:text-white mb-4">
-                                        Ubah Password
-                                    </h2>
-                                    <div className="space-y-4">
-                                        <ChangePasswordInputs
-                                            oldPassword={
-                                                formPassword.oldPassword
-                                            }
-                                            newPassword={
-                                                formPassword.newPassword
-                                            }
-                                            confirmNewPassword={
-                                                formPassword.confirmNewPassword
-                                            }
-                                            onChangeOldPassword={
-                                                handlePasswordChange
-                                            }
-                                            onChangeNewPassword={
-                                                handlePasswordChange
-                                            }
-                                            onChangeConfirmNewPassword={
-                                                handlePasswordChange
-                                            }
-                                        />
-
-                                        <Button
-                                            text={
-                                                loading
-                                                    ? 'Mengubah...'
-                                                    : 'Ubah Password'
-                                            }
-                                            onClick={handlePasswordSubmit}
-                                            bgColor="bg-[#007395]"
-                                        />
-                                    </div>
-                                </div>
+                                <UpdatePassword API_URL={BASE_URL} />
 
                                 <Button
                                     text="Sign out"

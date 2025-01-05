@@ -1,7 +1,7 @@
 import { authMiddleware } from '@/middlewares/auth.middleware';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateFields } from './validator';
-import { updateAdminPasswordService } from '@/modules/admin/admin.service';
+import { updateAdminPasswordService } from '@/app/api/modules/admin/admin.service';
 
 export async function PUT(req: NextRequest) {
     try {

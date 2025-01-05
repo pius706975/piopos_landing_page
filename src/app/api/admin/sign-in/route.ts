@@ -1,4 +1,4 @@
-import { signInAdminService } from '@/modules/auth/auth.service';
+import { signInAdminService } from '@/app/api/modules/auth/auth.service';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateRefreshToken } from '@/modules/auth/auth.repo';
+import { validateRefreshToken } from '@/app/api/modules/auth/auth.repo';
 import { generateJWT, verifyJWT } from '@/middlewares/jwt.service';
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'access_secret';
