@@ -99,3 +99,22 @@ export const updatePassword = async ({
         throw new Error('An unexpected error occurred');
     }
 };
+
+export const signOut = async ({API_URL}: {API_URL: string | undefined}) => {
+    const accessToken = localStorage.getItem('accessToken');
+    try {
+        await axios.post(
+            `${API_URL}/admin/sign-out`,
+            {},
+            {
+                headers: { Authorization: accessToken },
+            }
+        )
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || 'Failed to sign out');
+        }
+
+        throw new Error('An unexpected error occurred');
+    }
+}

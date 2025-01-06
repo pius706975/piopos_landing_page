@@ -1,5 +1,5 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import LoadingComponent from '@/components/Loading';
 import { useAuth } from '@/service/api';
 import useAdminValidation from '../hook/validateAdmin';
@@ -7,17 +7,42 @@ import ThemeChanger from '@/components/DarkSwitch';
 import Button from '@/components/button/Button';
 import UpdateProfile from './components/UpdateProfile';
 import UpdatePassword from './components/UpdatePassword';
-import { fetchProfile } from './components/hooks/hooks';
+import { fetchProfile, signOut } from './components/hooks/hooks';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const AdminProfile = () => {
     useAuth();
     const { isAdminLoggedIn, isAdminLoading } = useAdminValidation();
+    const [loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
+
     const { data, isLoading, error } = useQuery({
         queryKey: ['profile'],
         queryFn: () => fetchProfile({ API_URL: BASE_URL }),
     });
+
+    const signOutMutation = useMutation({
+        mutationFn: () => signOut({ API_URL: BASE_URL }),
+        onMutate: () => setLoading(true),
+        onSuccess: () => {
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('accessToken');
+            setLoading(false);
+            router.push('/addash/sign-in');
+        },
+        onError: error => {
+            console.log(error);
+            setLoading(false);
+        },
+    });
+
+    const handleSignOut = () => {
+        signOutMutation.mutate();
+    };
 
     if (isLoading)
         return (
@@ -77,8 +102,10 @@ const AdminProfile = () => {
                                 <UpdatePassword API_URL={BASE_URL} />
 
                                 <Button
-                                    text="Sign out"
-                                    onClick={() => {}}
+                                    text={
+                                        loading ? 'Signing out...' : 'Sign out'
+                                    }
+                                    onClick={handleSignOut}
                                     bgColor="bg-red-500"
                                 />
                             </div>
