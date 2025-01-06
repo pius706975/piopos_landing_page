@@ -1,4 +1,3 @@
-// components/PasswordInputs.tsx
 import React, { useState } from 'react';
 
 interface PasswordInputsProps {
