@@ -1,24 +1,30 @@
 import mongoose from 'mongoose';
 
-let isConnected: boolean = false;
+const MONGODB_URL = process.env.MONGODB_URL || '';
+
+if (!MONGODB_URL) {
+    console.error('Missing environment variable: MONGODB_URL');
+    process.exit(1);
+}
 
 export const connectToDatabase = async () => {
     mongoose.set('strictQuery', true);
 
-    if (!process.env.MONGODB_URL)
-        return console.log('Missing environment variable: MONGODB_URL');
-
-    if (isConnected) return;
+    if (mongoose.connection.readyState === 1) {
+        console.log('MongoDB is already connected');
+        return;
+    }
 
     try {
-        await mongoose.connect(process.env.MONGODB_URL, {
+        await mongoose.connect(MONGODB_URL, {
             dbName: 'pioposlp',
+            connectTimeoutMS: 50000,
+            socketTimeoutMS: 75000, 
         });
-
-        isConnected = true;
 
         console.log('MongoDB is connected');
     } catch (error) {
-        console.log('MongoDB connection failed', error);
+        console.error('MongoDB connection failed:', error);
+        throw new Error('Failed to connect to MongoDB');
     }
 };
