@@ -18,6 +18,7 @@ const AdminProfile = () => {
     const { isAdminLoggedIn, isAdminLoading } = useAdminValidation();
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
+
     const { data, isLoading, error } = useQuery({
         queryKey: ['profile'],
         queryFn: () => fetchProfile({ API_URL: BASE_URL }),
@@ -25,12 +26,10 @@ const AdminProfile = () => {
 
     const signOutMutation = useMutation({
         mutationFn: () => signOut({ API_URL: BASE_URL }),
-        onMutate: () => {
-            setLoading(true);
-        },
+        onMutate: () => setLoading(true),
         onSuccess: () => {
-            localStorage.removeItem('refreshToken');
             localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('refreshToken');
             localStorage.removeItem('accessToken');
             setLoading(false);
             router.push('/addash/sign-in');
@@ -42,11 +41,7 @@ const AdminProfile = () => {
     });
 
     const handleSignOut = () => {
-        try {
-            signOutMutation.mutate();
-        } catch (error: any) {
-            console.log(error.message);
-        }
+        signOutMutation.mutate();
     };
 
     if (isLoading)
