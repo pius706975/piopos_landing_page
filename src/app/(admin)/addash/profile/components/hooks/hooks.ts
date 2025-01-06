@@ -1,12 +1,12 @@
 import axios from 'axios';
 
+const accessToken = localStorage.getItem('accessToken');
+
 export const fetchProfile = async ({
     API_URL,
 }: {
     API_URL: string | undefined;
 }) => {
-    const accessToken = localStorage.getItem('accessToken');
-
     try {
         const response = await axios.get(`${API_URL}/admin/profile`, {
             headers: { Authorization: accessToken },
@@ -40,7 +40,6 @@ export const updateProfile = async ({
     username,
     email,
 }: UpdateProfileProps) => {
-    const accessToken = localStorage.getItem('accessToken');
     try {
         await axios.put(
             `${API_URL}/admin/profile/edit`,
@@ -76,7 +75,6 @@ export const updatePassword = async ({
     oldPassword,
     newPassword,
 }: UpdatePasswordProps) => {
-    const accessToken = localStorage.getItem('accessToken');
     try {
         await axios.put(
             `${API_URL}/admin/profile/update-password`,
@@ -93,6 +91,26 @@ export const updatePassword = async ({
             throw new Error(
                 error.response?.data?.message ||
                     'Failed to update admin password',
+            );
+        }
+
+        throw new Error('An unexpected error occurred');
+    }
+};
+
+export const signOut = async ({ API_URL }: { API_URL: string | undefined }) => {
+    try {
+        await axios.post(
+            `${API_URL}/admin/sign-out`,
+            {},
+            {
+                headers: { Authorization: accessToken },
+            },
+        );
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(
+                error.response?.data?.message || 'Failed to sign out',
             );
         }
 

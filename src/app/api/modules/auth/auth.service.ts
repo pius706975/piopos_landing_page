@@ -33,3 +33,9 @@ export const signInAdminService = async (email: string, password: string) => {
         refreshToken: refreshToken,
     };
 };
+
+export const signOutAdminService = async (id: string) => {
+    await updateRefreshToken(id, '');
+
+    return;
+};
